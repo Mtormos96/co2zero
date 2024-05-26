@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Export to Excel</title>
+    <title>Export to Excel
+    </title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,53 +62,51 @@
 
 <section>
     <h2>Exportar a Excel</h2>
-    <p>FUNCIONAMIENTO DE LA APP + DESCRIPCION</p>
-        <?php
-        // Incluir la biblioteca PHPExcel
-        require 'PHPExcel/Classes/PHPExcel.php';
+    <p>Este apartado permitira exportar a Excel los calculos realizados en las calculadoras de alcance 1 y 2</p>
+        <?php /*
+        require __DIR__ . '/../vendor/autoload.php';
+        use PhpOffice\PhpSpreadsheet\Spreadsheet;
+        use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-        // Crear un nuevo objeto PHPExcel
-        $objPHPExcel = new PHPExcel();
+        // Función para exportar los resultados a Excel
+        function exportarAExcel($resultados) {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
-        // Establecer propiedades del documento
-        $objPHPExcel->getProperties()->setCreator("Variable usuario")
-                                     ->setLastModifiedBy("Variable usuario")
-                                     ->setTitle("Resultado")
-                                     ->setSubject("Resultados de calculos alcance (VARIABLE ALCANCE)")
-                                     ->setDescription("Archivo de Excel con los valores de los calculos huella de carbono")
-                                     ->setKeywords("excel phpexcel php")
-                                     ->setCategory("Resultados");
+            // Agregar encabezados
+            $sheet->setCellValue('A1', 'Descripción');
+            $sheet->setCellValue('B1', 'Dato de Actividad');
+            $sheet->setCellValue('C1', 'Factor de Emisión');
+            $sheet->setCellValue('D1', 'Emisiones de CO2');
 
-        // Agregar datos a las celdas
-        $objPHPExcel->setActiveSheetIndex(0)
-                    ->setCellValue('A1', 'Alcance 1')
-                    ->setCellValue('B1', 'Alcance 2')
-                    ->setCellValue('C1', 'Alcance 3')
-                    ->setCellValue('A2', $cal_1_result)
-                    ->setCellValue('B2', $cal_2_result)
-                    ->setCellValue('C2', $cal_3_result);
+            $row = 2;
+            foreach ($resultados as $resultado) {
+                $sheet->setCellValue('A' . $row, $resultado['descripcion']);
+                $sheet->setCellValue('B' . $row, $resultado['activityData']);
+                $sheet->setCellValue('C' . $row, $resultado['emissionFactor']);
+                $sheet->setCellValue('D' . $row, $resultado['emisiones']);
+                $row++;
+            }
 
-        // Establecer estilo de las celdas
-        $objPHPExcel->getActiveSheet()->getStyle('A1:C2')->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle('A1:C2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'emisiones_co2.xlsx';
 
-        // Ajustar el ancho de las columnas
-        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(15);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
-        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+            // Configurar encabezados para descarga
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header('Cache-Control: max-age=0');
 
-        // Nombre del archivo
-        $filename = "resultados_calculo_CO2Zero.xlsx";
+            $writer->save('php://output');
+            exit;
+        }
 
-        // Configurar encabezados para descarga
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
-        // Guardar el archivo Excel en el formato adecuado
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        $objWriter->save('php://output');
-        exit;
+        // Verificar si se debe exportar a Excel
+        if (isset($_POST['export'])) {
+            if (!empty($_POST['resultados'])) {
+                $resultados = json_decode($_POST['resultados'], true);
+                exportarAExcel($resultados);
+            }
+        } */
         ?>
 </section>
 

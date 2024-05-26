@@ -1,0 +1,8 @@
+{
+    "name": "manuel/co2zero",
+    "description": "composer for php",
+    "type": "library",
+    "require": {
+        "phpoffice/phpspreadsheet": "^2.1"
+    }
+}

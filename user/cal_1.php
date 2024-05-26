@@ -1,3 +1,145 @@
+<?php
+// Incluir la biblioteca PHPExcel
+require __DIR__ . '/../vendor/autoload.php';
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+// Función para calcular las emisiones de CO2
+function calcularEmisiones($activityData, $emissionFactor) {
+    return $activityData * $emissionFactor;
+}
+
+// Función para exportar los resultados a Excel
+function exportarAExcel($resultados) {
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Agregar encabezados
+    $sheet->setCellValue('A1', 'Descripción');
+    $sheet->setCellValue('B1', 'Dato de Actividad');
+    $sheet->setCellValue('C1', 'Factor de Emisión');
+    $sheet->setCellValue('D1', 'Emisiones de CO2');
+
+    $row = 2;
+    foreach ($resultados as $resultado) {
+        $sheet->setCellValue('A' . $row, $resultado['descripcion']);
+        $sheet->setCellValue('B' . $row, $resultado['activityData']);
+        $sheet->setCellValue('C' . $row, $resultado['emissionFactor']);
+        $sheet->setCellValue('D' . $row, $resultado['emisiones']);
+        $row++;
+    }
+
+    $writer = new Xlsx($spreadsheet);
+    $fileName = 'emisiones_co2.xlsx';
+
+    // Configurar encabezados para descarga
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $fileName . '"');
+    header('Cache-Control: max-age=0');
+
+    $writer->save('php://output');
+    exit;
+}
+
+// Inicializar resultados
+$resultados = [];
+
+// Inicializar variables de resultados
+$result1 = "";
+$result2 = "";
+$result3 = "";
+$result4 = "";
+$result5 = "";
+$result6 = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Calcular emisiones según el formulario enviado
+    $activityData = 0;
+    $emissionFactor = 0;
+    $descripcion = "";
+
+    if (isset($_POST["activityData1"])) {
+        $activityData = floatval($_POST["activityData1"]);
+        $emissionFactor = floatval($_POST["emissionFactor1"]);
+        $descripcion = "Emisiones de CO2 (Instalaciones fijas)";
+        $emisiones = calcularEmisiones($activityData, $emissionFactor);
+        $result1 = $descripcion . ": " . $emisiones . " Kg CO2<br>";
+        $resultados[] = [
+            'descripcion' => $descripcion,
+            'activityData' => $activityData,
+            'emissionFactor' => $emissionFactor,
+            'emisiones' => $emisiones
+        ];
+    } elseif (isset($_POST["activityData2"])) {
+        $activityData = floatval($_POST["activityData2"]);
+        $emissionFactor = floatval($_POST["emissionFactor2"]);
+        $descripcion = "Emisiones de CO2 (Transporte por carretera)";
+        $emisiones = calcularEmisiones($activityData, $emissionFactor);
+        $result2 = $descripcion . ": " . $emisiones . " Kg CO2<br>";
+        $resultados[] = [
+            'descripcion' => $descripcion,
+            'activityData' => $activityData,
+            'emissionFactor' => $emissionFactor,
+            'emisiones' => $emisiones
+        ];
+    } elseif (isset($_POST["activityData3"])) {
+        $activityData = floatval($_POST["activityData3"]);
+        $emissionFactor = floatval($_POST["emissionFactor3"]);
+        $descripcion = "Emisiones de CO2 (Otros medios de transporte)";
+        $emisiones = calcularEmisiones($activityData, $emissionFactor);
+        $result3 = $descripcion . ": " . $emisiones . " Kg CO2<br>";
+        $resultados[] = [
+            'descripcion' => $descripcion,
+            'activityData' => $activityData,
+            'emissionFactor' => $emissionFactor,
+            'emisiones' => $emisiones
+        ];
+    } elseif (isset($_POST["activityData4"])) {
+        $activityData = floatval($_POST["activityData4"]);
+        $emissionFactor = floatval($_POST["emissionFactor4"]);
+        $descripcion = "Emisiones de CO2 (Maquinaria)";
+        $emisiones = calcularEmisiones($activityData, $emissionFactor);
+        $result4 = $descripcion . ": " . $emisiones . " Kg CO2<br>";
+        $resultados[] = [
+            'descripcion' => $descripcion,
+            'activityData' => $activityData,
+            'emissionFactor' => $emissionFactor,
+            'emisiones' => $emisiones
+        ];
+    } elseif (isset($_POST["activityData5"])) {
+        $activityData = floatval($_POST["activityData5"]);
+        $emissionFactor = floatval($_POST["emissionFactor5"]);
+        $descripcion = "Emisiones de CO2 (Fuga de gases fluorados)";
+        $emisiones = calcularEmisiones($activityData, $emissionFactor);
+        $result5 = $descripcion . ": " . $emisiones . " Kg CO2<br>";
+        $resultados[] = [
+            'descripcion' => $descripcion,
+            'activityData' => $activityData,
+            'emissionFactor' => $emissionFactor,
+            'emisiones' => $emisiones
+        ];
+    } elseif (isset($_POST["activityData6"])) {
+        $activityData = floatval($_POST["activityData6"]);
+        $emissionFactor = floatval($_POST["emissionFactor6"]);
+        $descripcion = "Emisiones de CO2 (Otros GEI)";
+        $emisiones = calcularEmisiones($activityData, $emissionFactor);
+        $result6 = $descripcion . ": " . $emisiones . " Kg CO2<br>";
+        $resultados[] = [
+            'descripcion' => $descripcion,
+            'activityData' => $activityData,
+            'emissionFactor' => $emissionFactor,
+            'emisiones' => $emisiones
+        ];
+    }
+
+    // Verificar si se debe exportar a Excel
+    if (isset($_POST['export'])) {
+        exportarAExcel($resultados);
+    }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -171,129 +313,16 @@
     </div>
 
     <?php
-    require 'vendor/autoload.php';
-    use PhpOffice\PhpSpreadsheet\Spreadsheet;
-    use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-    // Definir variables para almacenar los resultados de cada calculadora
-    $result1 = "";
-    $result2 = "";
-    $result3 = "";
-    $result4 = "";
-    $result5 = "";
-    $result6 = "";
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['calculate'])) {
-        // Obtener los valores del formulario
-        $activityData = 0;
-        $emissionFactor = 0;
-        $co2Emissions = 0;
-        $result = "";
-
-        if (isset($_POST["activityData1"])) {
-            $activityData = floatval($_POST["activityData1"]);
-            $emissionFactor = floatval($_POST["emissionFactor1"]);
-            $co2Emissions = $activityData * $emissionFactor;
-            $result1 = "Emisiones de CO2 (Instalaciones fijas): " . $co2Emissions . " Kg CO2<br>";
-        } elseif (isset($_POST["activityData2"])) {
-            $activityData = floatval($_POST["activityData2"]);
-            $emissionFactor = floatval($_POST["emissionFactor2"]);
-            $co2Emissions = $activityData * $emissionFactor;
-            $result2 = "Emisiones de CO2 (Transporte por carretera): " . $co2Emissions . " Kg CO2<br>";
-        } elseif (isset($_POST["activityData3"])) {
-            $activityData = floatval($_POST["activityData3"]);
-            $emissionFactor = floatval($_POST["emissionFactor3"]);
-            $co2Emissions = $activityData * $emissionFactor;
-            $result3 = "Emisiones de CO2 (Otros medios de transporte): " . $co2Emissions . " Kg CO2<br>";
-        } elseif (isset($_POST["activityData4"])) {
-            $activityData = floatval($_POST["activityData4"]);
-            $emissionFactor = floatval($_POST["emissionFactor4"]);
-            $co2Emissions = $activityData * $emissionFactor;
-            $result4 = "Emisiones de CO2 (Maquinaria): " . $co2Emissions . " Kg CO2<br>";
-        } elseif (isset($_POST["activityData5"])) {
-            $activityData = floatval($_POST["activityData5"]);
-            $emissionFactor = floatval($_POST["emissionFactor5"]);
-            $co2Emissions = $activityData * $emissionFactor;
-            $result5 = "Emisiones de CO2 (Fuga de gases fluorados): " . $co2Emissions . " Kg CO2<br>";
-        } elseif (isset($_POST["activityData6"])) {
-            $activityData = floatval($_POST["activityData6"]);
-            $emissionFactor = floatval($_POST["emissionFactor6"]);
-            $co2Emissions = $activityData * $emissionFactor;
-            $result6 = "Emisiones de CO2 (Otros GEI): " . $co2Emissions . " Kg CO2<br>";
-        }
-
-        // Mostrar los resultados
-        echo "<h2>Resultados:</h2>";
-        if ($result1) echo $result1;
-        if ($result2) echo $result2;
-        if ($result3) echo $result3;
-        if ($result4) echo $result4;
-        if ($result5) echo $result5;
-        if ($result6) echo $result6;
-    }
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['export'])) {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        $sheet->setCellValue('A1', 'Dato de Actividad');
-        $sheet->setCellValue('B1', 'Factor de Emisión');
-        $sheet->setCellValue('C1', 'Emisiones de CO2');
-
-        $row = 2;
-        if ($result1) {
-            $sheet->setCellValue('A' . $row, $_POST["activityData1"]);
-            $sheet->setCellValue('B' . $row, $_POST["emissionFactor1"]);
-            $sheet->setCellValue('C' . $row, floatval($_POST["activityData1"]) * floatval($_POST["emissionFactor1"]));
-            $row++;
-        }
-        if ($result2) {
-            $sheet->setCellValue('A' . $row, $_POST["activityData2"]);
-            $sheet->setCellValue('B' . $row, $_POST["emissionFactor2"]);
-            $sheet->setCellValue('C' . $row, floatval($_POST["activityData2"]) * floatval($_POST["emissionFactor2"]));
-            $row++;
-        }
-        if ($result3) {
-            $sheet->setCellValue('A' . $row, $_POST["activityData3"]);
-            $sheet->setCellValue('B' . $row, $_POST["emissionFactor3"]);
-            $sheet->setCellValue('C' . $row, floatval($_POST["activityData3"]) * floatval($_POST["emissionFactor3"]));
-            $row++;
-        }
-        if ($result4) {
-            $sheet->setCellValue('A' . $row, $_POST["activityData4"]);
-            $sheet->setCellValue('B' . $row, $_POST["emissionFactor4"]);
-            $sheet->setCellValue('C' . $row, floatval($_POST["activityData4"]) * floatval($_POST["emissionFactor4"]));
-            $row++;
-        }
-        if ($result5) {
-            $sheet->setCellValue('A' . $row, $_POST["activityData5"]);
-            $sheet->setCellValue('B' . $row, $_POST["emissionFactor5"]);
-            $sheet->setCellValue('C' . $row, floatval($_POST["activityData5"]) * floatval($_POST["emissionFactor5"]));
-            $row++;
-        }
-        if ($result6) {
-            $sheet->setCellValue('A' . $row, $_POST["activityData6"]);
-            $sheet->setCellValue('B' . $row, $_POST["emissionFactor6"]);
-            $sheet->setCellValue('C' . $row, floatval($_POST["activityData6"]) * floatval($_POST["emissionFactor6"]));
-            $row++;
-        }
-
-        $writer = new Xlsx($spreadsheet);
-        $fileName = 'emisiones_co2.xlsx';
-        $writer->save($fileName);
-
-        // Descargar el archivo
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
-        header('Cache-Control: max-age=0');
-        readfile($fileName);
-
-        // Eliminar el archivo después de la descarga
-        unlink($fileName);
-        exit;
-    }
+    // Mostrar los resultados
+    if ($result1) echo "<h2>Resultados:</h2>" . $result1;
+    if ($result2) echo "<h2>Resultados:</h2>" . $result2;
+    if ($result3) echo "<h2>Resultados:</h2>" . $result3;
+    if ($result4) echo "<h2>Resultados:</h2>" . $result4;
+    if ($result5) echo "<h2>Resultados:</h2>" . $result5;
+    if ($result6) echo "<h2>Resultados:</h2>" . $result6;
     ?>
     <form action="" method="POST">
+        <br></br>
         <input type="submit" name="export" value="Exportar a Excel">
     </form>
 </section>
